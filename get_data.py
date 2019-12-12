@@ -28,6 +28,13 @@ def get_consumption(url, api_key):
             df = df.append(df_n, ignore_index = True)
         else:
             next_pages = False
+    
+    df['start_date'] = df.interval_start.apply(lambda x: x.date().strftime('%Y-%m-%d'))
+    df['end_date'] = df.interval_end.apply(lambda x: x.date().strftime('%Y-%m-%d'))
+    df['start_hour'] = df.interval_start.apply(lambda x: x.hour)
+    df['start_minute'] = df.interval_start.apply(lambda x: x.minute)
+    df['end_hour'] = df.interval_end.apply(lambda x: x.hour)
+    df['end_minute'] = df.interval_end.apply(lambda x: x.minute)
     return df
 
 def get_tariffs():
@@ -35,7 +42,7 @@ def get_tariffs():
 
 def main():
     cons = get_consumption(url, api_key)
-    print(cons)
+    #cons.to_csv('test.csv')
 
 if __name__ == '__main__':
     main()
