@@ -1,6 +1,8 @@
 import json
 import requests
 import pandas as pd
+import os
+from datetime import datetime
 
 with open('keys.json', 'r') as f:
     keys = json.load(f)
@@ -11,7 +13,7 @@ meter_id = keys['meter_id']
 
 url = "https://api.octopus.energy/v1/electricity-meter-points/{}/meters/{}/consumption/".format(mpan, meter_id)
 
-def get_consumption(url, api_key):    
+def get_consumption(url, api_key, save_csv = True):    
     n = 1
     next_pages = True
     df = pd.DataFrame(columns=['consumption', 'interval_end', 'interval_start'])
@@ -35,14 +37,28 @@ def get_consumption(url, api_key):
     df['start_minute'] = df.interval_start.apply(lambda x: x.minute)
     df['end_hour'] = df.interval_end.apply(lambda x: x.hour)
     df['end_minute'] = df.interval_end.apply(lambda x: x.minute)
-    return df
+    if save_csv:
+        os.chdir('./data/imports')
+        folder_name = datetime.today().strftime('%Y%m%d')
+        file_n = 1
+        file_name = '{}.csv'.format(file_n)
+        if not os.path.exists(folder_name):
+            os.mkdir(folder_name)
+            
+        while os.path.isfile('{}/{}'.format(folder_name, file_name)):
+            file_n += 1
+            file_name = '{}.csv'.format(file_n)
+
+        os.chdir(folder_name)
+        df.to_csv(file_name)
+        return df
 
 def get_tariffs():
     pass
 
 def main():
-    cons = get_consumption(url, api_key)
-    cons.to_csv('./tests/output_test.csv')
+    get_consumption(url, api_key)
+    #cons.to_csv('./tests/output_test.csv')
 
 if __name__ == '__main__':
     main()
