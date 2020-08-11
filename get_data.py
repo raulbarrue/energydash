@@ -58,7 +58,7 @@ def get_tariffs():
 
 def main():
     cons = get_consumption(url, api_key)
-    cons.to_csv('./tests/output_test.csv')
+    cons.to_csv('./outputs/energy_data.csv')
 
 if __name__ == '__main__':
     main()
