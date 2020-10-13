@@ -19,6 +19,7 @@ def get_consumption(url, api_key, save_csv = False):
     df = pd.DataFrame(columns=['consumption', 'interval_end', 'interval_start'])
     
     while next_pages:
+        print("Downloading page:", n)
         url_page = url + '?page={}'.format(n)
         response = requests.get(url_page, auth=(api_key, None))
         if response.status_code == 200:
@@ -30,6 +31,7 @@ def get_consumption(url, api_key, save_csv = False):
             df = df.append(df_n, ignore_index = True)
         else:
             next_pages = False
+    print("Finished downlading")
     
     df['start_date'] = df.interval_start.apply(lambda x: x.date().strftime('%Y-%m-%d'))
     df['end_date'] = df.interval_end.apply(lambda x: x.date().strftime('%Y-%m-%d'))
@@ -57,6 +59,7 @@ def get_tariffs():
     pass
 
 def main():
+    os.makedirs("outputs", exist_ok=True)
     cons = get_consumption(url, api_key)
     cons.to_csv('./outputs/energy_data.csv')
 
